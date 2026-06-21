@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block title %}{{ incident.title }}{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h4 class="mb-0"><i class="bi bi-bell me-2 text-warning"></i>{{ incident.title }}</h4>
+    <div class="d-flex gap-2">
+        <a href="{{ url_for('incidents.edit', id=incident.id) }}" class="btn btn-outline-primary">
+            <i class="bi bi-pencil me-1"></i>Düzenle
+        </a>
+        <a href="{{ url_for('incidents.index') }}" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left me-1"></i>Geri
+        </a>
+    </div>
+</div>
+
+<div class="row g-3">
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header bg-white fw-semibold">Olay Bilgileri</div>
+            <div class="card-body">
+                {% set st_map = {'Açık': 'danger', 'İnceleniyor': 'warning', 'Çözüldü': 'success', 'Kapatıldı': 'secondary'} %}
+                <dl class="mb-0">
+                    <dt class="text-muted small">Şiddet</dt>
+                    <dd><span class="badge bg-{{ incident.severity_class }}">{{ incident.severity }}</span></dd>
+                    <dt class="text-muted small">Durum</dt>
+                    <dd><span class="badge bg-{{ st_map.get(incident.status, 'secondary') }}">{{ incident.status }}</span></dd>
+                    <dt class="text-muted small">Raporlayan</dt>
+                    <dd>{{ incident.reporter or '—' }}</dd>
+                    <dt class="text-muted small">Atanan</dt>
+                    <dd>{{ incident.assignee or '—' }}</dd>
+                    <dt class="text-muted small">Kayıt Tarihi</dt>
+                    <dd>{{ incident.created_at.strftime('%d.%m.%Y %H:%M') }}</dd>
+                    {% if incident.resolved_at %}
+                    <dt class="text-muted small">Çözüm Tarihi</dt>
+                    <dd>{{ incident.resolved_at.strftime('%d.%m.%Y %H:%M') }}</dd>
+                    {% endif %}
+                </dl>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-8">
+        <div class="card mb-3">
+            <div class="card-header bg-white fw-semibold">Açıklama</div>
+            <div class="card-body">
+                {% if incident.description %}
+                <div style="white-space: pre-wrap;">{{ incident.description }}</div>
+                {% else %}
+                <p class="text-muted">Açıklama bulunmuyor.</p>
+                {% endif %}
+            </div>
+        </div>
+        {% if incident.resolution %}
+        <div class="card">
+            <div class="card-header bg-white fw-semibold">Çözüm Notları</div>
+            <div class="card-body">
+                <div style="white-space: pre-wrap;">{{ incident.resolution }}</div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

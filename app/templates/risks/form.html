@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+{% block title %}{{ 'Risk Düzenle' if risk else 'Yeni Risk' }}{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h4 class="mb-0">
+        <i class="bi bi-exclamation-triangle me-2 text-danger"></i>
+        {{ 'Riski Düzenle' if risk else 'Yeni Risk Ekle' }}
+    </h4>
+    <a href="{{ url_for('risks.index') }}" class="btn btn-outline-secondary">
+        <i class="bi bi-arrow-left me-1"></i>Geri
+    </a>
+</div>
+
+<div class="card" style="max-width: 780px;">
+    <div class="card-body">
+        <form method="POST">
+            <div class="mb-3">
+                <label class="form-label fw-semibold">Risk Başlığı <span class="text-danger">*</span></label>
+                <input type="text" name="title" class="form-control"
+                       value="{{ risk.title if risk else '' }}" required>
+            </div>
+            <div class="mb-3">
+                <label class="form-label fw-semibold">Açıklama</label>
+                <textarea name="description" class="form-control" rows="3">{{ risk.description if risk else '' }}</textarea>
+            </div>
+            <div class="mb-3">
+                <label class="form-label fw-semibold">İlgili Varlık</label>
+                <select name="asset_id" class="form-select">
+                    <option value="">— Varlık Seçiniz —</option>
+                    {% for asset in assets %}
+                    <option value="{{ asset.id }}"
+                        {{ 'selected' if risk and risk.asset_id == asset.id }}>
+                        {{ asset.name }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label class="form-label fw-semibold">Olasılık (1-5)</label>
+                    <input type="range" name="likelihood" class="form-range" min="1" max="5" step="1"
+                           value="{{ risk.likelihood if risk else 1 }}" id="likelihood"
+                           oninput="updateScore()">
+                    <div class="d-flex justify-content-between text-muted small">
+                        <span>1 - Çok Düşük</span><span>3 - Orta</span><span>5 - Çok Yüksek</span>
+                    </div>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="form-label fw-semibold">Etki (1-5)</label>
+                    <input type="range" name="impact" class="form-range" min="1" max="5" step="1"
+                           value="{{ risk.impact if risk else 1 }}" id="impact"
+                           oninput="updateScore()">
+                    <div class="d-flex justify-content-between text-muted small">
+                        <span>1 - Çok Düşük</span><span>3 - Orta</span><span>5 - Çok Yüksek</span>
+                    </div>
+                </div>
+            </div>
+            <div class="mb-3">
+                <div class="alert alert-light border" id="score-display">
+                    Risk Skoru: <strong id="score-val">{{ (risk.likelihood * risk.impact) if risk else 1 }}</strong>
+                    — Seviye: <strong id="level-val">{{ risk.risk_level if risk else 'Düşük' }}</strong>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label class="form-label fw-semibold">Risk Muamelesi</label>
+                    <select name="treatment" class="form-select">
+                        {% for t in treatments %}
+                        <option value="{{ t }}" {{ 'selected' if risk and risk.treatment == t }}>{{ t }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="form-label fw-semibold">Durum</label>
+                    <select name="status" class="form-select">
+                        {% for s in statuses %}
+                        <option value="{{ s }}" {{ 'selected' if risk and risk.status == s }}>{{ s }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <div class="mb-3">
+                <label class="form-label fw-semibold">Muamele Planı</label>
+                <textarea name="treatment_plan" class="form-control" rows="3">{{ risk.treatment_plan if risk else '' }}</textarea>
+            </div>
+            <div class="mb-3">
+                <label class="form-label fw-semibold">Risk Sahibi</label>
+                <input type="text" name="owner" class="form-control"
+                       value="{{ risk.owner if risk else '' }}">
+            </div>
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-danger">
+                    <i class="bi bi-check-lg me-1"></i>{{ 'Güncelle' if risk else 'Kaydet' }}
+                </button>
+                <a href="{{ url_for('risks.index') }}" class="btn btn-outline-secondary">İptal</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function updateScore() {
+    const l = parseInt(document.getElementById('likelihood').value);
+    const i = parseInt(document.getElementById('impact').value);
+    const score = l * i;
+    document.getElementById('score-val').textContent = score;
+    let level, cls;
+    if (score <= 5) { level = 'Düşük'; cls = 'alert-success'; }
+    else if (score <= 12) { level = 'Orta'; cls = 'alert-warning'; }
+    else { level = 'Yüksek'; cls = 'alert-danger'; }
+    document.getElementById('level-val').textContent = level;
+    const disp = document.getElementById('score-display');
+    disp.className = 'alert border ' + cls;
+}
+updateScore();
+</script>
+{% endblock %}

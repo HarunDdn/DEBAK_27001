@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block title %}Kontrol Güncelle — {{ control.control_id }}{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h4 class="mb-0">
+        <i class="bi bi-check2-square me-2 text-success"></i>
+        Kontrol Güncelle — <span class="font-monospace">{{ control.control_id }}</span>
+    </h4>
+    <a href="{{ url_for('controls.index') }}" class="btn btn-outline-secondary">
+        <i class="bi bi-arrow-left me-1"></i>Geri
+    </a>
+</div>
+
+<div class="card" style="max-width: 680px;">
+    <div class="card-body">
+        <div class="mb-3 p-3 bg-light rounded">
+            <div class="fw-semibold">{{ control.name }}</div>
+            <small class="text-muted">{{ control.category }}</small>
+        </div>
+        <form method="POST">
+            <div class="mb-3">
+                <label class="form-label fw-semibold">Uygulama Durumu</label>
+                <select name="status" class="form-select">
+                    {% for s in statuses %}
+                    <option value="{{ s }}" {{ 'selected' if control.status == s }}>{{ s }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="mb-3">
+                <label class="form-label fw-semibold">Sorumlu Kişi / Birim</label>
+                <input type="text" name="responsible" class="form-control"
+                       value="{{ control.responsible or '' }}">
+            </div>
+            <div class="mb-3">
+                <label class="form-label fw-semibold">Kanıt / Uygulama Belgesi</label>
+                <textarea name="evidence" class="form-control" rows="4">{{ control.evidence or '' }}</textarea>
+            </div>
+            <div class="mb-3">
+                <label class="form-label fw-semibold">Notlar</label>
+                <textarea name="notes" class="form-control" rows="3">{{ control.notes or '' }}</textarea>
+            </div>
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-success">
+                    <i class="bi bi-check-lg me-1"></i>Güncelle
+                </button>
+                <a href="{{ url_for('controls.index') }}" class="btn btn-outline-secondary">İptal</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

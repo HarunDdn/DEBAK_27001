@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% block title %}Risk Değerlendirme{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h4 class="mb-0"><i class="bi bi-exclamation-triangle me-2 text-danger"></i>Risk Değerlendirme</h4>
+    <a href="{{ url_for('risks.new') }}" class="btn btn-danger">
+        <i class="bi bi-plus-lg me-1"></i>Yeni Risk
+    </a>
+</div>
+
+<div class="card">
+    <div class="card-body p-0">
+        {% if risks %}
+        <table class="table table-hover mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th class="ps-3">Risk Başlığı</th>
+                    <th>İlgili Varlık</th>
+                    <th>Olasılık</th>
+                    <th>Etki</th>
+                    <th>Risk Skoru</th>
+                    <th>Seviye</th>
+                    <th>Muamele</th>
+                    <th>Durum</th>
+                    <th class="text-end pe-3">İşlemler</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for risk in risks %}
+                <tr>
+                    <td class="ps-3 fw-semibold">{{ risk.title }}</td>
+                    <td>{{ risk.asset.name if risk.asset else '—' }}</td>
+                    <td class="text-center">{{ risk.likelihood }}</td>
+                    <td class="text-center">{{ risk.impact }}</td>
+                    <td class="text-center fw-bold">{{ risk.risk_score }}</td>
+                    <td>
+                        <span class="badge bg-{{ risk.risk_level_class }}">{{ risk.risk_level }}</span>
+                    </td>
+                    <td><span class="badge bg-info text-dark">{{ risk.treatment }}</span></td>
+                    <td>
+                        {% set st_map = {'Açık': 'danger', 'İşleniyor': 'warning', 'Kapalı': 'success'} %}
+                        <span class="badge bg-{{ st_map.get(risk.status, 'secondary') }}">{{ risk.status }}</span>
+                    </td>
+                    <td class="text-end pe-3">
+                        <a href="{{ url_for('risks.edit', id=risk.id) }}" class="btn btn-sm btn-outline-primary me-1">
+                            <i class="bi bi-pencil"></i>
+                        </a>
+                        <form method="POST" action="{{ url_for('risks.delete', id=risk.id) }}" class="d-inline"
+                              onsubmit="return confirm('Bu riski silmek istediğinizden emin misiniz?')">
+                            <button type="submit" class="btn btn-sm btn-outline-danger">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div class="text-center py-5 text-muted">
+            <i class="bi bi-exclamation-triangle fs-1"></i>
+            <p class="mt-2">Henüz risk kaydı bulunmuyor.</p>
+            <a href="{{ url_for('risks.new') }}" class="btn btn-danger mt-1">İlk Riski Ekle</a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

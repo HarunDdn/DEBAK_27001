@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block title %}{{ policy.title }}{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h4 class="mb-0"><i class="bi bi-file-text me-2 text-secondary"></i>{{ policy.title }}</h4>
+    <div class="d-flex gap-2">
+        <a href="{{ url_for('policies.edit', id=policy.id) }}" class="btn btn-outline-primary">
+            <i class="bi bi-pencil me-1"></i>Düzenle
+        </a>
+        <a href="{{ url_for('policies.index') }}" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left me-1"></i>Geri
+        </a>
+    </div>
+</div>
+
+<div class="row g-3">
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header bg-white fw-semibold">Politika Bilgileri</div>
+            <div class="card-body">
+                {% set st_map = {'Taslak': 'secondary', 'Gözden Geçiriliyor': 'info', 'Onaylandı': 'success', 'Arşivlendi': 'dark'} %}
+                <dl class="mb-0">
+                    <dt class="text-muted small">Durum</dt>
+                    <dd><span class="badge bg-{{ st_map.get(policy.status, 'secondary') }}">{{ policy.status }}</span></dd>
+                    <dt class="text-muted small">Sürüm</dt>
+                    <dd>v{{ policy.version }}</dd>
+                    <dt class="text-muted small">Sorumlu</dt>
+                    <dd>{{ policy.owner or '—' }}</dd>
+                    <dt class="text-muted small">Oluşturulma</dt>
+                    <dd>{{ policy.created_at.strftime('%d.%m.%Y') }}</dd>
+                    <dt class="text-muted small">Son Güncelleme</dt>
+                    <dd>{{ policy.updated_at.strftime('%d.%m.%Y') }}</dd>
+                </dl>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header bg-white fw-semibold">İçerik</div>
+            <div class="card-body">
+                {% if policy.content %}
+                <div style="white-space: pre-wrap;">{{ policy.content }}</div>
+                {% else %}
+                <p class="text-muted">İçerik bulunmuyor.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

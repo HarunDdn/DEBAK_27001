@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% block title %}{{ 'Olay Düzenle' if incident else 'Yeni Olay' }}{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h4 class="mb-0">
+        <i class="bi bi-bell me-2 text-warning"></i>
+        {{ 'Olayı Düzenle' if incident else 'Yeni Olay Kaydet' }}
+    </h4>
+    <a href="{{ url_for('incidents.index') }}" class="btn btn-outline-secondary">
+        <i class="bi bi-arrow-left me-1"></i>Geri
+    </a>
+</div>
+
+<div class="card" style="max-width: 780px;">
+    <div class="card-body">
+        <form method="POST">
+            <div class="mb-3">
+                <label class="form-label fw-semibold">Olay Başlığı <span class="text-danger">*</span></label>
+                <input type="text" name="title" class="form-control"
+                       value="{{ incident.title if incident else '' }}" required>
+            </div>
+            <div class="mb-3">
+                <label class="form-label fw-semibold">Açıklama</label>
+                <textarea name="description" class="form-control" rows="4">{{ incident.description if incident else '' }}</textarea>
+            </div>
+            <div class="row">
+                <div class="col-md-4 mb-3">
+                    <label class="form-label fw-semibold">Şiddet</label>
+                    <select name="severity" class="form-select">
+                        {% for s in severities %}
+                        <option value="{{ s }}" {{ 'selected' if incident and incident.severity == s }}>{{ s }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label class="form-label fw-semibold">Durum</label>
+                    <select name="status" class="form-select">
+                        {% for s in statuses %}
+                        <option value="{{ s }}" {{ 'selected' if incident and incident.status == s }}>{{ s }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label class="form-label fw-semibold">Raporlayan</label>
+                    <input type="text" name="reporter" class="form-control"
+                           value="{{ incident.reporter if incident else '' }}"
+                           {{ 'readonly' if incident }}>
+                </div>
+            </div>
+            <div class="mb-3">
+                <label class="form-label fw-semibold">Atanan Kişi</label>
+                <input type="text" name="assignee" class="form-control"
+                       value="{{ incident.assignee if incident else '' }}">
+            </div>
+            {% if incident %}
+            <div class="mb-3">
+                <label class="form-label fw-semibold">Çözüm Notları</label>
+                <textarea name="resolution" class="form-control" rows="4">{{ incident.resolution or '' }}</textarea>
+            </div>
+            {% endif %}
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-warning">
+                    <i class="bi bi-check-lg me-1"></i>{{ 'Güncelle' if incident else 'Kaydet' }}
+                </button>
+                <a href="{{ url_for('incidents.index') }}" class="btn btn-outline-secondary">İptal</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
